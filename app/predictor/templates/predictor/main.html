@@ -1,6 +1,38 @@
 {% extends "base.html" %}
+
 {% block title %}Stock Price Prediction{% endblock %}
 
 {% block content %}
-<p>Main page</p>
+
+<h2>Stock Price Prediction</h2>
+
+<form method="post" action="{% url 'predictor:predict_stock' %}">
+    {% csrf_token %}
+    <div class="input-group mb-3">
+        <label for="ticker">Enter stock ticker:</label>
+        <input type="text" id="ticker" name="ticker" class="form-control" required>
+        <button type="submit" class="btn btn-info">Get prediction</button>
+    </div>
+</form>
+
+{% if dates|length > 0 and prices|length > 0 %}
+    <h3>{{ ticker }} stock price</h3>
+    <canvas id="stockChart"></canvas>
+    <p>Predicted price for tomorrow: {{ predicted_price }}</p>
+
+    <script>
+    var ctx = document.getElementById('stockChart').getContext('2d');
+    var stockChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ dates|safe }},
+            datasets: [{
+                label: 'Stock Price',
+                data: {{ prices|safe }},
+                borderColor: 'rgba(75, 192, 192, 1)',
+            }]
+        }
+    });
+    </script>
+{% endif %}
 {% endblock %}
