@@ -3,36 +3,69 @@
 {% block title %}Stock Price Prediction{% endblock %}
 
 {% block content %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <h2>Stock Price Prediction</h2>
 
 <form method="post" action="{% url 'predictor:predict_stock' %}">
     {% csrf_token %}
     <div class="input-group mb-3">
-        <label for="ticker">Enter stock ticker:</label>
-        <input type="text" id="ticker" name="ticker" class="form-control" required>
+        <label for="ticker">Select stock ticker:</label>
+        <select id="ticker" name="ticker" class="form-control" required>
+            <option value="" disabled selected>Select a ticker</option>
+            {% for ticker in tickers %}
+            <option value="{{ ticker }}" {% if ticker == selected_ticker %}selected{% endif %}>{{ ticker }}</option>
+            {% endfor %}
+        </select>
         <button type="submit" class="btn btn-info">Get prediction</button>
     </div>
 </form>
 
-{% if dates|length > 0 and prices|length > 0 %}
-    <h3>{{ ticker }} stock price</h3>
-    <canvas id="stockChart"></canvas>
-    <p>Predicted price for tomorrow: {{ predicted_price }}</p>
+<div class="main-with-chart">
+{% if dates|length < 0 and prices|length < 0 %}
+
+{% else %}
+    <h3>{{ ticker }} ({{ company_name }}) stock price</h3>
+    <p>Predicted price for tomorrow: {{ predicted_price|floatformat:2 }}</p>
+    <div><canvas id="stockChart" width="400" height="200"></canvas></div>
+    {% endif %}
+</div>
 
     <script>
-    var ctx = document.getElementById('stockChart').getContext('2d');
-    var stockChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: {{ dates|safe }},
-            datasets: [{
-                label: 'Stock Price',
-                data: {{ prices|safe }},
-                borderColor: 'rgba(75, 192, 192, 1)',
-            }]
-        }
-    });
+        
+        document.addEventListener("DOMContentLoaded", function () {
+            var ctx = document.getElementById('stockChart').getContext('2d');
+            var stockChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: {{ dates|safe }},
+                    datasets: [{
+                        label: 'Stock Price',
+                        data: JSON.parse('{{ prices|safe|escapejs }}'), 
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Price'
+                            }
+                        }
+                    }
+                }
+            });
+        });
     </script>
-{% endif %}
+    
+
 {% endblock %}

@@ -1,3 +1,5 @@
+import requests
+from bs4 import BeautifulSoup
 import yfinance as yf
 import pandas as pd
 from sklearn.linear_model import LinearRegression
@@ -26,6 +28,14 @@ def train_model(historical_data):
 
 
 def predict_stock(request):
+    ticker = None
+    company_name = None
+    predicted_price = None
+    dates = []
+    prices = []
+
+    tickers = get_tickers()
+
     if request.method == "POST":
         ticker = request.POST.get("ticker").upper()
 
@@ -35,11 +45,13 @@ def predict_stock(request):
             return render(
                 request,
                 "predictor/main.html",
-                {"error": "No data found for this ticker."},
+                {"tickers": tickers, "error": "No data found for this ticker."},
             )
 
+        company_name = get_full_company_name(ticker)
+
         dates = historical_data["Date"].dt.strftime("%Y-%m-%d").tolist()
-        prices = historical_data["Close"]
+        prices = historical_data["Close"].values.flatten().tolist()
 
         model = train_model(historical_data)
         future_date = np.array(
@@ -48,11 +60,37 @@ def predict_stock(request):
         predicted_price = model.predict(future_date)
 
         context = {
+            "tickers": tickers,
             "ticker": ticker,
+            "company_name": company_name,
             "dates": dates,
             "prices": prices,
             "predicted_price": predicted_price[0],
         }
         return render(request, "predictor/main.html", context)
 
-    return render(request, "predictor/main.html")
+    return render(
+        request,
+        "predictor/main.html",
+        {
+            "tickers": tickers,
+        },
+    )
+
+
+def get_tickers():
+    url = "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies"
+    soup = BeautifulSoup(requests.get(url).text, "html.parser")
+    table = soup.find("table", {"class": "wikitable"})
+
+    tickers = []
+    for row in table.find_all("tr")[1:]:
+        ticker = row.find_all("td")[0].text.strip()
+        tickers.append(ticker)
+
+    return tickers
+
+
+def get_full_company_name(ticker):
+    stock = yf.Ticker(ticker)
+    return stock.info.get("longName", "Unknown Company")

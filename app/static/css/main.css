@@ -12,3 +12,84 @@
 *::after :hover {
     text-decoration: none;
 }
+
+body {
+    padding: 20px; 
+}
+
+p, h1, h2, h3, h4, h5, h6 {
+    margin-bottom: 10px; 
+}
+
+form {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 1.8rem;
+    color: #333;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+label.form-label {
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+select.form-control {
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: border-color 0.3s ease;
+    width: 100%;
+}
+
+#ticker {
+    width: 100%;
+}
+
+select.form-control:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+button.btn-info {
+    padding: 10px 20px;
+    font-size: 1rem;
+    background-color: #17a2b8;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button.btn-info:hover {
+    background-color: #138496;
+}
+
+.mb-3 {
+    margin-bottom: 15px;
+}
+
+.main-with-chart{
+    text-align: center;
+    margin-bottom: 30px;
+    width: 100%;   
+}
