@@ -3,6 +3,6 @@ black==24.10.0
 pandas==2.2.3
 numpy==2.1.2
 scikit-learn==1.5.2
-yfinance==0.2.48
+yfinance==0.2.52
 beautifulsoup4==4.12.3
 requests==2.32.3
